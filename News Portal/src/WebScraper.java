@@ -25,7 +25,18 @@ final class WebScraper {
             Elements imageLinks = container.select("div.lx-stream-related-story--index-image-wrapper > img");
     
             for(Element title:newsTitles) {
-                this.titles.add(title.text().replaceAll("[‘’]" , ""));
+                String t = title.text().replaceAll("[‘’]" , "");
+                if(t.startsWith("'")) {
+
+                    t = t.substring(1);
+                }
+
+                if(t.endsWith("'")) {
+
+                    t = t.substring(0, t.length());
+                }
+                    
+                this.titles.add(t);
             }
 
             for(Element link:newsLinks) {

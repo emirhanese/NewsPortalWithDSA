@@ -247,6 +247,28 @@ public class GuiController {
             this.newsLabels.get(i).setText(newsTitles.get(i));
             this.newsLabels.get(i).setGraphicTextGap(90);
         }
+
+        sortNewsLabels(imageLinks);
+    }
+
+    // Bubble sort algorithm to sort news according to their titles.
+    private void sortNewsLabels(LinkedList<String> imageLinks) {
+
+        for(int i = 0; i < imageLinks.length() - 1; i++) {
+
+            for(int j = 0; j < imageLinks.length() - i - 1; j++) {
+
+                if((this.newsLabels.get(j)).getText().compareTo(((this.newsLabels.get(j + 1))).getText()) > 0) {
+
+                    String tempText = this.newsLabels.get(j).getText();
+                    ImageView tempGraphic = (ImageView) this.newsLabels.get(j).getGraphic();
+                    this.newsLabels.get(j).setGraphic((ImageView)this.newsLabels.get(j + 1).getGraphic());
+                    this.newsLabels.get(j).setText(this.newsLabels.get(j + 1).getText());
+                    this.newsLabels.get(j + 1).setGraphic(tempGraphic);
+                    this.newsLabels.get(j + 1).setText(tempText);
+                }
+            }
+        }
     }
 
     private void mouseEntered(MouseEvent event) {
