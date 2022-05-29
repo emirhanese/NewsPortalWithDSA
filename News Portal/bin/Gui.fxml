@@ -68,7 +68,7 @@
                   <Insets left="70.0" />
                </padding>
             </Label>
-            <Label alignment="CENTER" layoutX="-8.0" layoutY="688.0" prefHeight="25.0" prefWidth="341.0" text="By: Emirhan Ese">
+            <Label alignment="CENTER" layoutX="-8.0" layoutY="688.0" prefHeight="25.0" prefWidth="341.0" text="By: Emirhan ESE and A.Eren SAGANDA">
                <font>
                   <Font name="Gill Sans Ultra Bold Condensed" size="14.0" />
                </font>
