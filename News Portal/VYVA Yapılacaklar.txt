@@ -1,5 +1,0 @@
-Searching Algorithm (Binary Search) (Haberin okunup okunmadığını stackten kontrol edecek.)
-Sorting Algorithm (Binary Sort) (Labellar arasında textlere göre binary sort uygulanacak büyük olan sola geçecek)
-Previous news (from Stack) (Okunan haber stacke eklenecek.)
-Most viewed category (Binary Search Tree) (Her bir kategoriye ait okunma sayısı değişkeni olacak. Kullanıcı her haber okuduğunda o haberin kategorisinin
-okunma sayısı değişkeni 1 artacak. Bu veriler BST'de tutulacak ve böylece program en fazla okunan kategori bilgisini kullanıcıya sunabilecek.)
