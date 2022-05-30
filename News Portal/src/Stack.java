@@ -1,3 +1,4 @@
+// Generic Stack class.
 public class Stack<T> {
     
     Node<T> headNode;
@@ -7,6 +8,7 @@ public class Stack<T> {
         this.headNode = null;
     }
 
+    // This function pushes an element type T to the Stack.
     public void push(T title) {
 
         Node<T> node = new Node<>(title);
@@ -23,6 +25,7 @@ public class Stack<T> {
         }
     }
 
+    // This function removes and returns the last element(Type T) pushed to the Stack.
     public T pop() {
 
         T poppedElement = null;
@@ -36,11 +39,13 @@ public class Stack<T> {
         return poppedElement;
     }
 
+    // This function checks if the Stack is empty.
     public boolean isEmpty() {
 
         return this.headNode == null;
     }
 
+    // This function prints out the values inside the Stack.
     public void printStack() {
 
         Node<T> temp = headNode;

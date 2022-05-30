@@ -1,3 +1,4 @@
+// Generic LinkedList class.
 public class LinkedList<T> {
 
     Node<T> root;
@@ -7,6 +8,7 @@ public class LinkedList<T> {
         this.root = null;
     }
 
+    // This functions adds a data which is type T(Generic) to Linked List.
     public void add(T data) {
 
         Node<T> nodeToBeAdded = new Node<>(data);
@@ -23,6 +25,8 @@ public class LinkedList<T> {
         }
     }
 
+
+    // This is a searching algorithm which finds and returns the index of the specified data.
     public int indexOf(T data) {
 
         Node<T> temp = this.root;
@@ -43,6 +47,7 @@ public class LinkedList<T> {
         return index;
     }
 
+    // This function returns type T data by given index.
     public T get(int index) {
 
         Node<T> temp = this.root;
@@ -63,6 +68,7 @@ public class LinkedList<T> {
         return temp.data;
     }
 
+    // This function returns the length of the linked list.
     public int length() {
 
         Node<T> temp = this.root;
@@ -78,6 +84,7 @@ public class LinkedList<T> {
         return counter;
     }
 
+    // This function prints out the linked list.
     public void printList() {
 
         Node<T> temp = this.root;

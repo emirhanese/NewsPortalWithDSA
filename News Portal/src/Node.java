@@ -1,3 +1,4 @@
+// This is a generic class which is used in LinkedList and Stack.
 public class Node<T> {
     
     T data;

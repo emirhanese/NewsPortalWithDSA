@@ -17,23 +17,26 @@ public class BinarySearchTree {
     }
 
     BSTNode root;
-    ArrayList<News> treeValues = new ArrayList<>();
+    ArrayList<News> treeValues = new ArrayList<>(); // Stores the values inserted to the tree.
 
     public BinarySearchTree () {
 
         this.root = null;
     }
 
+    // This function inserts a data to the tree.
     public void insert(News data) {
 
         this.root = insertRec(root, data);
     }
 
+    // This function returns the root of the tree.
     public BSTNode getRoot() {
 
         return this.root;
     }
 
+    // Recursive function to insert the data to the tree.
     private BSTNode insertRec(BSTNode root, News data) {
 
         if(root == null) {
@@ -56,11 +59,13 @@ public class BinarySearchTree {
         return root;
     }
 
+    // Inorder traversal method.
     public void printInorder() {
 
         inorderRec(this.root);
     }
 
+    // This function checks if user hasn't read any news yet.
     private boolean notViewedYet() {
 
         for(News item : this.treeValues) {
@@ -72,6 +77,7 @@ public class BinarySearchTree {
         return true;
     }
 
+    // Recursive function to print the values inside the tree with inorder traversal.
     private void inorderRec(BSTNode root) {
 
         if(root != null) {
@@ -82,6 +88,7 @@ public class BinarySearchTree {
         }
     }
 
+    // This function returns an arraylist which includes tree's values.
     private ArrayList<News> getTreeValues() {
 
         ArrayList<News> temp = new ArrayList<>();
@@ -94,12 +101,14 @@ public class BinarySearchTree {
         return temp;
     }
 
+    // This function deletes the whole tree.
     private void clearTree() {
 
         this.root = null;
         this.treeValues.clear();
     }
 
+    // This function recreates the tree from an arraylist.
     public void updateTree() {
 
         ArrayList<News> temp = getTreeValues();
@@ -111,6 +120,7 @@ public class BinarySearchTree {
         }
     }
 
+    // This function finds the node which has the most read number by the user and then returns that node's category.
     public String getMostViewedCategory(BSTNode node) {
 
         if(notViewedYet())
