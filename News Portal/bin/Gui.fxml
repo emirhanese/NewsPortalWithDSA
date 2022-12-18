@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.paint.*?>
@@ -11,7 +12,112 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GuiController">
    <children>
-      <Pane layoutX="-1.0" layoutY="-1.0" prefHeight="726.0" prefWidth="335.0" style="-fx-background-color: rgb(153, 153, 255);">
+      <StackPane fx:id="menuPage" prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: rgb(153, 153, 255);">
+         <children>
+            <Pane fx:id="mainMenu" prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <Label layoutX="1.0" prefHeight="118.0" prefWidth="1280.0" style="-fx-alignment: center; -fx-background-color: rgb(229,204,255);" text="News Portal">
+                     <font>
+                        <Font size="50.0" />
+                     </font></Label>
+                  <Button fx:id="loginButton" alignment="CENTER" layoutX="548.0" layoutY="315.0" mnemonicParsing="false" onMouseClicked="#entertainmentButtonClicked" prefHeight="30.0" prefWidth="185.0" style="-fx-border-color: rgb(64, 64, 64); -fx-border-radius: 15; -fx-background-color: rgb(192, 192, 192); -fx-background-radius: 15; -fx-border-width: 2; -fx-font-family: Bookman Old Style; -fx-font-weight: Bold; -fx-font-size: 13;" text="Login">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <font>
+                        <Font name="Bookman Old Style Bold" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="registerButton" alignment="CENTER" layoutX="549.0" layoutY="425.0" mnemonicParsing="false" onMouseClicked="#entertainmentButtonClicked" prefHeight="30.0" prefWidth="185.0" style="-fx-border-color: rgb(64, 64, 64); -fx-border-radius: 15; -fx-background-color: rgb(192, 192, 192); -fx-background-radius: 15; -fx-border-width: 2; -fx-font-family: Bookman Old Style; -fx-font-weight: Bold; -fx-font-size: 13;" text="Register">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <font>
+                        <Font name="Bookman Old Style Bold" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="exitButton" alignment="CENTER" layoutX="548.0" layoutY="535.0" mnemonicParsing="false" onMouseClicked="#entertainmentButtonClicked" prefHeight="30.0" prefWidth="185.0" style="-fx-border-color: rgb(64, 64, 64); -fx-border-radius: 15; -fx-background-color: rgb(192, 192, 192); -fx-background-radius: 15; -fx-border-width: 2; -fx-font-family: Bookman Old Style; -fx-font-weight: Bold; -fx-font-size: 13;" text="Exit">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <font>
+                        <Font name="Bookman Old Style Bold" size="13.0" />
+                     </font>
+                  </Button>
+               </children></Pane>
+            <Pane fx:id="loginMenu" prefHeight="200.0" prefWidth="200.0" visible="false">
+               <children>
+                  <Button fx:id="loginButton1" alignment="CENTER" disable="true" layoutX="380.0" layoutY="475.0" mnemonicParsing="false" onMouseClicked="#entertainmentButtonClicked" prefHeight="30.0" prefWidth="185.0" style="-fx-border-color: rgb(64, 64, 64); -fx-border-radius: 15; -fx-background-color: rgb(192, 192, 192); -fx-background-radius: 15; -fx-border-width: 2; -fx-font-family: Bookman Old Style; -fx-font-weight: Bold; -fx-font-size: 13;" text="Login">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <font>
+                        <Font name="Bookman Old Style Bold" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="returnButton" alignment="CENTER" layoutX="697.0" layoutY="475.0" mnemonicParsing="false" onMouseClicked="#entertainmentButtonClicked" prefHeight="30.0" prefWidth="185.0" style="-fx-border-color: rgb(64, 64, 64); -fx-border-radius: 15; -fx-background-color: rgb(192, 192, 192); -fx-background-radius: 15; -fx-border-width: 2; -fx-font-family: Bookman Old Style; -fx-font-weight: Bold; -fx-font-size: 13;" text="Back">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <font>
+                        <Font name="Bookman Old Style Bold" size="13.0" />
+                     </font>
+                  </Button>
+                  <Label layoutX="461.0" layoutY="225.0" style="-fx-font-size: 15; -fx-font-weight: bold;" text="Username :">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="463.0" layoutY="332.0" style="-fx-font-weight: bold; -fx-font-size: 15px;" text="Password :">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <PasswordField fx:id="loginPassField" layoutX="566.0" layoutY="328.0" prefHeight="25.0" prefWidth="185.0" promptText="password" />
+                  <TextField fx:id="loginUsernameField" layoutX="566.0" layoutY="223.0" prefHeight="25.0" prefWidth="185.0" promptText="username" />
+               </children></Pane>
+            <Pane fx:id="registerMenu" prefHeight="200.0" prefWidth="200.0" visible="false">
+               <children>
+                  <VBox alignment="CENTER_RIGHT" layoutX="195.0" layoutY="106.0" prefHeight="478.0" prefWidth="290.0" spacing="60.0">
+                     <children>
+                        <Label style="-fx-font-size: 15; -fx-font-weight: bold;" text="Name" />
+                        <Label style="-fx-font-size: 15; -fx-font-weight: bold;" text="Surname" />
+                        <Label style="-fx-font-size: 15; -fx-font-weight: bold;" text="E-mail" />
+                        <Label style="-fx-font-size: 15; -fx-font-weight: bold;" text="Age" />
+                        <Label style="-fx-font-size: 15; -fx-font-weight: bold;" text="Username" />
+                        <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" style="-fx-font-size: 15; -fx-font-weight: bold;" text="Password" />
+                     </children>
+                  </VBox>
+                  <VBox layoutX="547.0" layoutY="131.0" prefHeight="428.0" prefWidth="224.0" spacing="56.0">
+                     <children>
+                        <TextField fx:id="registerNameField" />
+                        <TextField fx:id="registerSurnameField" />
+                        <TextField fx:id="registerMailField" />
+                        <TextField fx:id="registerAgeField" />
+                        <TextField fx:id="registerUsernameField" />
+                        <PasswordField fx:id="registerPassField" />
+                     </children>
+                  </VBox>
+                  <Button fx:id="registerButton1" alignment="CENTER" disable="true" layoutX="362.0" layoutY="631.0" mnemonicParsing="false" onMouseClicked="#entertainmentButtonClicked" prefHeight="30.0" prefWidth="185.0" style="-fx-border-color: rgb(64, 64, 64); -fx-border-radius: 15; -fx-background-color: rgb(192, 192, 192); -fx-background-radius: 15; -fx-border-width: 2; -fx-font-family: Bookman Old Style; -fx-font-weight: Bold; -fx-font-size: 13;" text="Register">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <font>
+                        <Font name="Bookman Old Style Bold" size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="returnButton1" alignment="CENTER" layoutX="771.0" layoutY="631.0" mnemonicParsing="false" onMouseClicked="#entertainmentButtonClicked" prefHeight="30.0" prefWidth="185.0" style="-fx-border-color: rgb(64, 64, 64); -fx-border-radius: 15; -fx-background-color: rgb(192, 192, 192); -fx-background-radius: 15; -fx-border-width: 2; -fx-font-family: Bookman Old Style; -fx-font-weight: Bold; -fx-font-size: 13;" text="Back">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <font>
+                        <Font name="Bookman Old Style Bold" size="13.0" />
+                     </font>
+                  </Button>
+               </children></Pane>
+         </children>
+      </StackPane>
+      <Pane fx:id="homeCategoryPane" layoutX="9.0" layoutY="9.0" prefHeight="726.0" prefWidth="335.0" style="-fx-background-color: rgb(153, 153, 255);" visible="false">
          <children>
             <VBox fx:id="buttonsBox" layoutX="53.0" layoutY="249.0" prefHeight="397.0" prefWidth="231.0" spacing="50.0" style="-fx-border-width: 5px; -fx-border-color: white; -fx-border-radius: 10;">
                <children>
@@ -77,12 +183,12 @@
                </padding>
             </Label>
             <Button fx:id="favoriteButton" alignment="CENTER" focusTraversable="false" layoutX="86.0" layoutY="31.0" maxHeight="40.0" maxWidth="47.0" mnemonicParsing="false" onMouseClicked="#favoriteButtonClicked" prefHeight="40.0" prefWidth="47.0" style="-fx-background-color: rgb(153, 153, 255); -fx-border-color: black; -fx-border-radius: 20; -fx-border-width: 2; -fx-background-radius: 20; -fx-max-height: 10; -fx-max-width: 10; -fx-min-height: 50; -fx-min-width: 50;">
-               <font>
-                  <Font name="System Bold" size="11.0" />
-               </font>
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
+               <font>
+                  <Font name="System Bold" size="11.0" />
+               </font>
             </Button>
             <Button fx:id="historyButton" alignment="CENTER" focusTraversable="false" layoutX="189.0" layoutY="31.0" maxHeight="40.0" maxWidth="47.0" mnemonicParsing="false" onMouseClicked="#historyButtonClicked" prefHeight="40.0" prefWidth="47.0" style="-fx-background-color: rgb(153, 153, 255); -fx-border-color: black; -fx-border-radius: 20; -fx-border-width: 2; -fx-background-radius: 20; -fx-max-height: 10; -fx-max-width: 10; -fx-min-height: 50; -fx-min-width: 50;">
                <cursor>
@@ -94,7 +200,7 @@
             </Button>
          </children>
       </Pane>
-      <StackPane layoutX="333.0" layoutY="-2.0" prefHeight="726.0" prefWidth="947.0" style="-fx-background-color: rgb(224, 224, 224);">
+      <StackPane fx:id="homeNewsPane" layoutX="333.0" layoutY="-2.0" prefHeight="726.0" prefWidth="947.0" style="-fx-background-color: rgb(224, 224, 224);" visible="false">
          <children>
             <ScrollPane fx:id="newsScrollPane" prefHeight="158.0" prefWidth="235.0">
               <content>

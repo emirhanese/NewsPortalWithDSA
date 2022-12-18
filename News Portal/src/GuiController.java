@@ -1,24 +1,24 @@
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class GuiController {
 
@@ -33,6 +33,11 @@ public class GuiController {
     private BinarySearchTree bst = new BinarySearchTree();
     private ArrayList<String> viewedNews = new ArrayList<>();
     private Object category = null;
+
+    private Database db = null;
+    private User loggedUser;
+
+    private Label currentNewsLabel = null;
 
     @FXML
     private Button healthButton;
@@ -87,6 +92,81 @@ public class GuiController {
 
     @FXML
     private Button businessButton;
+
+    @FXML
+    private Button exitButton;
+
+    @FXML
+    private Button loginButton;
+
+    @FXML
+    private Button registerButton;
+
+    @FXML
+    private Button loginButton1;
+
+    @FXML
+    private Button returnButton;
+
+    @FXML
+    private Button registerButton1;
+
+    @FXML
+    private Button returnButton1;
+
+    @FXML
+    private Pane mainMenu;
+
+    @FXML
+    private Pane loginMenu;
+
+    @FXML
+    private Pane registerMenu;
+
+    @FXML
+    private Pane homeCategoryPane;
+
+    @FXML
+    private StackPane homeNewsPane;
+
+    @FXML
+    private StackPane menuPage;
+
+    @FXML
+    private TextField registerNameField;
+
+    @FXML
+    private TextField registerSurnameField;
+
+    @FXML
+    private TextField registerMailField;
+
+    @FXML
+    private TextField registerAgeField;
+
+    @FXML
+    private TextField registerUsernameField;
+
+    @FXML
+    private PasswordField registerPassField;
+
+    @FXML
+    private PasswordField loginPassField;
+
+    @FXML
+    private TextField loginUsernameField;
+
+    @FXML
+    private Button postCommentButton;
+
+    @FXML
+    private Button showCommentsButton;
+
+    @FXML
+    private ScrollPane commentsScrollPane;
+
+    @FXML
+    private AnchorPane commentsPane;
 
     @FXML
     void entertainmentButtonClicked(MouseEvent event) {
@@ -180,22 +260,29 @@ public class GuiController {
 
     @FXML
     void backButtonClicked(MouseEvent event) {
-
-        this.history.push(this.titleLabel.getText());
-        this.history.push(this.detailedText.getText());
-        this.history.push(this.imageLabel.getGraphic());
-
-        if(!viewedAlready(this.titleLabel.getText())) {
-
-            this.viewedNews.add(this.titleLabel.getText());
-            ((News)this.category).increaseViewsCounter();
-            this.bst.updateTree();
+        if(this.commentsScrollPane.isVisible()) {
+            this.commentsScrollPane.setVisible(false);
+            this.showCommentsButton.setDisable(false);
+            this.detailedTextPane.setVisible(true);
         }
-        
-        historyButtonController();
 
-        this.newsDetailScrollPane.setVisible(false);
-        this.newsPane.setVisible(true);
+        else {
+            this.history.push(this.titleLabel.getText());
+            this.history.push(this.detailedText.getText());
+            this.history.push(this.imageLabel.getGraphic());
+
+            if (!viewedAlready(this.titleLabel.getText())) {
+
+                this.viewedNews.add(this.titleLabel.getText());
+                ((News) this.category).increaseViewsCounter();
+                this.bst.updateTree();
+            }
+
+            historyButtonController();
+
+            this.newsDetailScrollPane.setVisible(false);
+            this.newsPane.setVisible(true);
+        }
     }
 
     @FXML
@@ -233,6 +320,115 @@ public class GuiController {
         }
     }
 
+    private void postComment(MouseEvent event) {
+
+        Stage newWindow = new Stage();
+        newWindow.setHeight(500);
+        newWindow.setWidth(500);
+        newWindow.setTitle("Post Comment");
+        newWindow.getIcons().add(new Image("file:icons/post-comment.png"));
+
+        AtomicBoolean postStatus = new AtomicBoolean(false);
+
+        Label title = new Label("Enter your comment in the box.");
+        TextArea textArea = new TextArea();
+        Button button = new Button("Post Comment");
+        button.setDisable(true);
+        textArea.textProperty().addListener((observable, oldValue, newValue) -> {
+            button.setDisable((textArea.getText().startsWith(" ") || textArea.getText().startsWith("\n")) ||
+                    textArea.getText().length() == 0);
+        });
+
+        button.setOnAction(e -> {
+            postStatus.set(db.postComment(textArea.getText(), db.getNewsId(currentNewsLabel.getText())));
+            if(postStatus.get()) {
+                processSuccessful("Comment has been posted successfully.");
+                db.insertIntoUserComment(loggedUser.getId(), db.getCommentId(textArea.getText()));
+            }
+            newWindow.close();
+        });
+        VBox container = new VBox(title, textArea, button);
+
+        container.setSpacing(15);
+        container.setPadding(new Insets(25));
+        container.setAlignment(Pos.CENTER);
+
+        newWindow.setScene(new Scene(container));
+
+        newWindow.show();
+    }
+
+    private void processSuccessful(String message) {
+
+        Alert alert = new Alert(AlertType.INFORMATION);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("file:icons/success.png"));
+        alert.setTitle("Success");
+        alert.setContentText(message);
+        alert.show();
+    }
+
+    //TODO: Show comments butonuna basıldığında veri tabanından ilgili habere yapılmış yorumlar çekilip arayüzde gösterilecektir.
+    private void showComments(MouseEvent event) {
+       this.showCommentsButton.setDisable(true);
+       String newsTitle = currentNewsLabel.getText();
+       int newsId = db.getNewsId(newsTitle);
+       List<Comment> comments = db.getComments(newsId);
+
+       if(comments.isEmpty())
+           commentsPane.setPrefHeight(582.0);
+
+       else
+           buildCommentsPage(comments);
+
+       this.detailedTextPane.setVisible(false);
+       this.commentsScrollPane.setVisible(true);
+    }
+
+    private void buildCommentsPage(List<Comment> comments) {
+        if(!commentsPane.getChildren().isEmpty())
+            commentsPane.getChildren().clear();
+
+        VBox vbox = new VBox();
+        vbox.setSpacing(65);
+        vbox.heightProperty().addListener((observable, oldValue, newValue) -> {
+            commentsPane.setPrefHeight(Double.parseDouble(newValue.toString()));
+        });
+
+        for(int i = 0; i < comments.size(); i++) {
+            HBox hbox = new HBox();
+            hbox.setPadding(new Insets(20, 20, 20, 20));
+            hbox.setSpacing(35);
+            hbox.setAlignment(Pos.CENTER_LEFT);
+            hbox.setStyle("-fx-background-color:rgb(240, 219, 219);");
+
+            Comment comment = comments.get(i);
+            int commentID = comment.getCommentId();
+            String commentText = comment.getCommentText();
+            Timestamp datePosted = comment.getDatePosted();
+            User user = db.getUserByCommentID(commentID);
+
+            Label nameLabel = new Label();
+            nameLabel.setGraphic(new ImageView("file:icons/user.png"));
+            nameLabel.setText(user.getName());
+            nameLabel.setGraphicTextGap(5);
+            nameLabel.setContentDisplay(ContentDisplay.TOP);
+
+            Label commentLabel = new Label();
+            commentLabel.setText(commentText);
+            commentLabel.setWrapText(true);
+            commentLabel.setContentDisplay(ContentDisplay.RIGHT);
+
+            Label dateLabel = new Label();
+            dateLabel.setText(datePosted.toString());
+            dateLabel.setContentDisplay(ContentDisplay.RIGHT);
+
+            hbox.getChildren().addAll(nameLabel, commentLabel, dateLabel);
+            vbox.getChildren().add(hbox);
+        }
+
+        commentsPane.getChildren().add(vbox);
+    }
     private void setImageAndTitle(LinkedList<String> imageLinks, LinkedList<String> newsTitles) {
 
         for (int i = 0; i < imageLinks.length(); i++) {
@@ -308,12 +504,86 @@ public class GuiController {
         }
     }
 
+    private void loginMenuCheck() {
+
+        if(this.loginUsernameField.getLength() > 0 && this.loginPassField.getLength() > 0) {
+            this.loginButton1.setDisable(false);
+        }
+
+        else
+            this.loginButton1.setDisable(true);
+    }
+
+    private void registerMenuCheck() {
+
+        if(this.registerNameField.getLength() > 0 && this.registerSurnameField.getLength() > 0 && this.registerMailField.getLength() > 0
+        && this.registerAgeField.getLength() > 0 && this.registerUsernameField.getLength() > 0 && this.registerPassField.getLength() > 0) {
+            this.registerButton1.setDisable(false);
+        }
+
+        else
+            this.registerButton1.setDisable(true);
+    }
+
+    private void login(MouseEvent event) {
+
+        String username = this.loginUsernameField.getText();
+        String pass = this.loginPassField.getText();
+
+        loggedUser = db.authenticateUser(username, pass);
+
+        if(loggedUser != null) {
+            System.out.println("Congratulations ! You've successfully logged in to News Portal.");
+            
+            this.menuPage.setVisible(false);
+            this.homeCategoryPane.setVisible(true);
+            this.homeNewsPane.setVisible(true);
+            this.loginMenu.setVisible(false);
+            this.mainMenu.setVisible(true);
+        }
+
+        else {
+            System.out.println("An error occurred while logging in !");
+        }
+    }
+
+    private void register(MouseEvent event) {
+
+        boolean registered;
+
+        String name = this.registerNameField.getText();
+        String surname = this.registerSurnameField.getText();
+        String email = this.registerMailField.getText();
+        int age = Integer.parseInt(this.registerAgeField.getText());
+        String username = this.registerUsernameField.getText();
+        String password = this.registerPassField.getText();
+
+        User userToRegister = new User(name, surname, email, age, username, password);
+        registered = db.addUser(userToRegister);
+
+        if(registered) {
+            processSuccessful("Congratulations! You have been successfully created your account.");
+        }
+
+        else {
+
+            Alert alert = new Alert(AlertType.NONE);
+            alert.setAlertType(AlertType.ERROR);
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image("file:icons/error.png"));
+            alert.setTitle("Error");
+            alert.setContentText("There is already an account registered with this information.");
+            alert.show();
+        }
+    }
+
     private void labelClicked(MouseEvent event) {
         this.imageLabel.setGraphic(null);
         this.detailedText.setText("");
         this.titleLabel.setText("");
 
         Label label = (Label) event.getSource();
+        currentNewsLabel = label;
         String title = label.getText();
         int index = ((News)this.category).getTitles().indexOf(title);
 
@@ -332,7 +602,8 @@ public class GuiController {
         this.detailedTextPane.prefHeightProperty().bind(this.detailedText.prefHeightProperty());
         this.newsPane.setVisible(false);
         this.newsDetailScrollPane.setVisible(true);
-        
+        db.insertReadNews(title, url, text);
+        db.insertIntoUserNews(loggedUser.getId(), db.getNewsId(title));
     }
 
     private void hisfavMouseEntered(MouseEvent event) {
@@ -360,8 +631,58 @@ public class GuiController {
         }
     }
 
+    private void exitButtonClicked(MouseEvent event) {
+
+        Platform.exit();
+        System.exit(1);
+    }
+
+    private void loginButtonClicked(MouseEvent event) {
+
+        this.mainMenu.setVisible(false);
+        this.loginMenu.setVisible(true);
+        this.loginUsernameField.textProperty().addListener((observable, oldValue, newValue) -> this.loginMenuCheck());
+        this.loginPassField.textProperty().addListener((observable, oldValue, newValue) -> this.loginMenuCheck());
+    }
+
+    private void registerButtonClicked(MouseEvent event) {
+
+        this.mainMenu.setVisible(false);
+        this.registerMenu.setVisible(true);
+        this.registerNameField.textProperty().addListener((observable, oldValue, newValue) -> this.registerMenuCheck());
+        this.registerSurnameField.textProperty().addListener((observable, oldValue, newValue) -> this.registerMenuCheck());
+        this.registerMailField.textProperty().addListener((observable, oldValue, newValue) -> this.registerMenuCheck());
+        this.registerAgeField.textProperty().addListener((observable, oldValue, newValue) -> this.registerMenuCheck());
+        this.registerUsernameField.textProperty().addListener((observable, oldValue, newValue) -> this.registerMenuCheck());
+        this.registerPassField.textProperty().addListener((observable, oldValue, newValue) -> this.registerMenuCheck());
+    }
+
+    private void returnButtonClicked(MouseEvent event) {
+
+        Button clickedButton = (Button)event.getSource();
+        if(clickedButton.getId().equals("returnButton")) {
+            this.loginUsernameField.setText(null);
+            this.loginPassField.setText(null);
+            this.loginMenu.setVisible(false);
+            this.mainMenu.setVisible(true);
+        }
+
+        else {
+            this.registerNameField.setText(null);
+            this.registerSurnameField.setText(null);
+            this.registerMailField.setText(null);
+            this.registerAgeField.setText(null);
+            this.registerUsernameField.setText(null);
+            this.registerPassField.setText(null);
+            this.registerMenu.setVisible(false);
+            this.mainMenu.setVisible(true);
+        }
+    }
+
     @FXML
     void initialize() {
+
+        db = Database.getDb();
 
         this.bst.insert(this.business);
         this.bst.insert(this.entertainment);
@@ -371,6 +692,16 @@ public class GuiController {
 
         this.newsPane.setVisible(false);
         this.newsDetailScrollPane.setVisible(false);
+
+        for (Node child : newsBox.getChildren()) {
+
+            Pane pane = (Pane) child;
+            Label label = (Label) pane.getChildren().get(0);
+            this.newsLabels.add(label);
+            label.setOnMouseEntered(this::mouseEntered);
+            label.setOnMouseExited(this::mouseExited);
+            label.setOnMouseClicked(this::labelClicked);
+        }
 
         Image favoriteImage = new Image("file:icons/favorite.png");
         Image historyImage = new Image("file:icons/history.png");
@@ -389,15 +720,21 @@ public class GuiController {
 
         this.historyButton.setDisable(true);
 
-        for (Node child : newsBox.getChildren()) {
+        this.registerAgeField.textProperty().addListener((observable, oldValue, newValue) -> {  
+            if (!newValue.matches("\\d*")) {
+                this.registerAgeField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
 
-            Pane pane = (Pane) child;
-            Label label = (Label) pane.getChildren().get(0);
-            this.newsLabels.add(label);
-            label.setOnMouseEntered(this::mouseEntered);
-            label.setOnMouseExited(this::mouseExited);
-            label.setOnMouseClicked(this::labelClicked);
-        }
+        this.exitButton.setOnMouseClicked(this::exitButtonClicked);
+        this.loginButton.setOnMouseClicked(this::loginButtonClicked);
+        this.registerButton.setOnMouseClicked(this::registerButtonClicked);
+        this.returnButton.setOnMouseClicked(this::returnButtonClicked);
+        this.returnButton1.setOnMouseClicked(this::returnButtonClicked);
+        this.registerButton1.setOnMouseClicked(this::register);
+        this.loginButton1.setOnMouseClicked(this::login);
+        this.postCommentButton.setOnMouseClicked(this::postComment);
+        this.showCommentsButton.setOnMouseClicked(this::showComments);
     }
 
 }
