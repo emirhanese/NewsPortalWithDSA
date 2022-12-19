@@ -8,6 +8,8 @@ public class User {
     private String username;
     private String password;
 
+    private String favoriteCategory;
+
     public User() {
         
     }
@@ -77,5 +79,13 @@ public class User {
 
     public void setId(int id) {
         Id = id;
+    }
+
+    public String getFavoriteCategory() {
+        return favoriteCategory;
+    }
+
+    public void setFavoriteCategory(String favoriteCategory) {
+        this.favoriteCategory = favoriteCategory;
     }
 }

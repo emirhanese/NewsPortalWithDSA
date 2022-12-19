@@ -18,7 +18,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class GuiController {
 
@@ -332,6 +334,7 @@ public class GuiController {
 
         Label title = new Label("Enter your comment in the box.");
         TextArea textArea = new TextArea();
+        textArea.setWrapText(true);
         Button button = new Button("Post Comment");
         button.setDisable(true);
         textArea.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -368,7 +371,6 @@ public class GuiController {
         alert.show();
     }
 
-    //TODO: Show comments butonuna basıldığında veri tabanından ilgili habere yapılmış yorumlar çekilip arayüzde gösterilecektir.
     private void showComments(MouseEvent event) {
        this.showCommentsButton.setDisable(true);
        String newsTitle = currentNewsLabel.getText();
@@ -395,14 +397,14 @@ public class GuiController {
             commentsPane.setPrefHeight(Double.parseDouble(newValue.toString()));
         });
 
-        for(int i = 0; i < comments.size(); i++) {
+        for (Comment value : comments) {
             HBox hbox = new HBox();
             hbox.setPadding(new Insets(20, 20, 20, 20));
             hbox.setSpacing(35);
             hbox.setAlignment(Pos.CENTER_LEFT);
             hbox.setStyle("-fx-background-color:rgb(240, 219, 219);");
 
-            Comment comment = comments.get(i);
+            Comment comment = value;
             int commentID = comment.getCommentId();
             String commentText = comment.getCommentText();
             Timestamp datePosted = comment.getDatePosted();
@@ -410,13 +412,15 @@ public class GuiController {
 
             Label nameLabel = new Label();
             nameLabel.setGraphic(new ImageView("file:icons/user.png"));
-            nameLabel.setText(user.getName());
+            nameLabel.setText(user.getName() + " " + user.getSurname());
             nameLabel.setGraphicTextGap(5);
             nameLabel.setContentDisplay(ContentDisplay.TOP);
 
             Label commentLabel = new Label();
             commentLabel.setText(commentText);
             commentLabel.setWrapText(true);
+            commentLabel.setTextAlignment(TextAlignment.JUSTIFY);
+            commentLabel.setMaxWidth(400);
             commentLabel.setContentDisplay(ContentDisplay.RIGHT);
 
             Label dateLabel = new Label();
@@ -533,8 +537,8 @@ public class GuiController {
         loggedUser = db.authenticateUser(username, pass);
 
         if(loggedUser != null) {
-            System.out.println("Congratulations ! You've successfully logged in to News Portal.");
-            
+            processSuccessful("Congratulations ! You've successfully logged in to News Portal.");
+            db.setUsersFavoriteCategory(loggedUser);
             this.menuPage.setVisible(false);
             this.homeCategoryPane.setVisible(true);
             this.homeNewsPane.setVisible(true);
@@ -543,8 +547,19 @@ public class GuiController {
         }
 
         else {
-            System.out.println("An error occurred while logging in !");
+            processFailed("An error occurred while logging in !");
         }
+    }
+
+    private void processFailed(String message) {
+
+        Alert alert = new Alert(AlertType.NONE);
+        alert.setAlertType(AlertType.ERROR);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("file:icons/error.png"));
+        alert.setTitle("Error");
+        alert.setContentText(message);
+        alert.show();
     }
 
     private void register(MouseEvent event) {
@@ -567,13 +582,7 @@ public class GuiController {
 
         else {
 
-            Alert alert = new Alert(AlertType.NONE);
-            alert.setAlertType(AlertType.ERROR);
-            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image("file:icons/error.png"));
-            alert.setTitle("Error");
-            alert.setContentText("There is already an account registered with this information.");
-            alert.show();
+            processFailed("There is already an account registered with this information.");
         }
     }
 
@@ -602,7 +611,7 @@ public class GuiController {
         this.detailedTextPane.prefHeightProperty().bind(this.detailedText.prefHeightProperty());
         this.newsPane.setVisible(false);
         this.newsDetailScrollPane.setVisible(true);
-        db.insertReadNews(title, url, text);
+        db.insertReadNews(title, url, text, ((News) this.category).getCategory());
         db.insertIntoUserNews(loggedUser.getId(), db.getNewsId(title));
     }
 
@@ -679,11 +688,16 @@ public class GuiController {
         }
     }
 
+    private void updateUserInfo(WindowEvent event) {
+
+        db.updateUsersFavoriteCategory(loggedUser);
+        System.out.println("User updated !");
+    }
+
     @FXML
     void initialize() {
 
         db = Database.getDb();
-
         this.bst.insert(this.business);
         this.bst.insert(this.entertainment);
         this.bst.insert(this.health);

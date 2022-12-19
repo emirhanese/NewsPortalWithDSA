@@ -49,7 +49,7 @@ public class Database {
         Connection conn = null;
 
         try {
-            conn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/" + dbName, user, pass);
+            conn = DriverManager.getConnection("jdbc:postgresql://db.aestech.me:5432/" + dbName, user, pass);
 
             if(conn != null)
                 System.out.println("Connection established successfully !");
@@ -119,13 +119,55 @@ public class Database {
                 emailList.add(email);
             }
 
-            System.out.println("Users have been fetched successfully.");
         }
         catch (SQLException e) {
             e.printStackTrace();
         }
 
         return usernameList.contains(user.getUsername()) || emailList.contains(user.getEmail());
+    }
+
+    public void setUsersFavoriteCategory(User loggedUser) {
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "SELECT favorite_category FROM users WHERE user_id = ?";
+
+        try {
+            statement = cursor.prepareStatement(query);
+            statement.setInt(1, loggedUser.getId());
+            rs = statement.executeQuery();
+            while(rs.next()) {
+                loggedUser.setFavoriteCategory(rs.getString("favorite_category"));
+            }
+            System.out.println("User's favorite category has been set successfully.");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateUsersFavoriteCategory(User loggedUser) {
+
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        String query = "ALTER TABLE users SET favorite_category = ? WHERE user_id = ?";
+
+        try {
+            statement = cursor.prepareStatement(query);
+            statement.setString(1, loggedUser.getFavoriteCategory());
+            statement.setInt(2, loggedUser.getId());
+            rs = statement.executeQuery();
+            while(rs.next()) {
+                loggedUser.setFavoriteCategory(rs.getString("favorite_category"));
+            }
+            System.out.println("User's favorite category has been updated successfully.");
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private boolean newsAlreadyInserted(String newsTitle) {
@@ -144,7 +186,6 @@ public class Database {
                 newsList.add(title);
             }
 
-            System.out.println("News have been fetched successfully.");
         }
         catch (SQLException e) {
             e.printStackTrace();
@@ -153,19 +194,19 @@ public class Database {
         return newsList.contains(newsTitle);
     }
 
-    //TODO: user_news tablosuna da implemente etmeyi unutma.
-    public void insertReadNews(String title, String image_url, String text) {
+    public void insertReadNews(String title, String image_url, String text, String category) {
 
         if(!newsAlreadyInserted(title)) {
             PreparedStatement statement = null;
 
-            String query = "INSERT INTO news (title, image_url, news_text) VALUES(?, ?, ?)";
+            String query = "INSERT INTO news (title, image_url, news_text, category) VALUES(?, ?, ?, ?)";
 
             try {
                 statement = cursor.prepareStatement(query);
                 statement.setString(1, title);
                 statement.setString(2, image_url);
                 statement.setString(3, text);
+                statement.setString(4, category);
                 statement.executeUpdate();
                 System.out.println("News has been registered to database successfully.");
             } catch (SQLException e) {
@@ -272,12 +313,15 @@ public class Database {
 
         PreparedStatement statement = null;
 
-        String query = "INSERT INTO user_news (user_id, news_id) VALUES(?, ?)";
+        String query = "INSERT INTO user_news (user_id, news_id) SELECT ?, ?" +
+                " WHERE NOT EXISTS (SELECT user_id, news_id FROM user_news WHERE user_id = ? AND news_id = ?)";
 
         try {
             statement = cursor.prepareStatement(query);
             statement.setInt(1, userID);
             statement.setInt(2, newsID);
+            statement.setInt(3, userID);
+            statement.setInt(4, newsID);
             statement.executeUpdate();
             System.out.println("User-News table updated successfully.");
         } catch (SQLException e) {
@@ -300,7 +344,7 @@ public class Database {
             statement.setObject(2, date);
             statement.setObject(3, news_id);
             statement.executeUpdate();
-            System.out.println("News has been registered to database successfully.");
+            System.out.println("Comment has been registered to database successfully.");
             posted = true;
         }
         catch (SQLException e) {
@@ -314,38 +358,14 @@ public class Database {
 
         PreparedStatement statement = null;
         ResultSet rs = null;
-        int id = -1;
+        User user = new User();
 
-        String query = "SELECT user_id FROM user_comment WHERE comment_id = ?";
+        String query = "SELECT users.user_id, users.name, users.surname, users.email, users.age, users.username, users.password, users.favorite_category FROM user_comment" +
+                " JOIN users ON users.user_id = user_comment.user_id WHERE user_comment.comment_id = ?";
 
         try {
             statement = cursor.prepareStatement(query);
             statement.setInt(1, commentID);
-            rs = statement.executeQuery();
-            while(rs.next()) {
-                id = rs.getInt("user_id");
-            }
-
-            System.out.println("News ID has been fetched successfully.");
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return getUserByID(id);
-    }
-
-    public User getUserByID(int userID) {
-
-        PreparedStatement statement = null;
-        ResultSet rs = null;
-        User user = new User();
-
-        String query = "SELECT * FROM users WHERE user_id = ?";
-
-        try {
-            statement = cursor.prepareStatement(query);
-            statement.setInt(1, userID);
             rs = statement.executeQuery();
             while(rs.next()) {
                 user.setId(rs.getInt("user_id"));
@@ -355,9 +375,10 @@ public class Database {
                 user.setPassword(rs.getString("password"));
                 user.setSurname(rs.getString("surname"));
                 user.setUsername(rs.getString("username"));
+                user.setFavoriteCategory(rs.getString("favorite_category"));
             }
 
-            System.out.println("User has been fetched successfully by ID.");
+            System.out.println("User has been fetched by comment's id successfully.");
         }
         catch (SQLException e) {
             e.printStackTrace();
